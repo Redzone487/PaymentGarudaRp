@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pembayaran - Konfirmasi via WhatsApp</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #3949ab, #5c6bc0);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 35px 40px;
+      border-radius: 20px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-weight: 700;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 25px;
+      color: #e3eafc;
+      user-select: none;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: #cbd5e1;
+      user-select: none;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 22px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      font-family: 'Poppins', sans-serif;
+      background-color: rgba(255,255,255,0.15);
+      color: #f0f9ff;
+      transition: box-shadow 0.3s ease;
+    }
+
+    select::placeholder, input::placeholder {
+      color: #a6b8d9;
+      font-style: italic;
+    }
+
+    select:focus, input:focus {
+      box-shadow: 0 0 10px #8c9eff;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px 0;
+      background: #77aaff;
+      color: #102a62;
+      font-weight: 700;
+      font-size: 1.25rem;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 12px 30px #77aaffcc;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+
+    button:hover {
+      background: #5984d6;
+      box-shadow: 0 14px 40px #5984d699;
+    }
+
+    footer {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      text-align: center;
+      color: #a5b3d1cc;
+      font-style: italic;
+      user-select: none;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" role="main" aria-label="Halaman konfirmasi pembayaran">
+    <h1>Konfirmasi Pembayaran</h1>
+
+    <form id="paymentForm" aria-label="Formulir konfirmasi pembayaran">
+      <label for="payerName">Nama Pembayar</label>
+      <input type="text" id="payerName" name="payerName" placeholder="Masukkan nama Anda" autocomplete="name" required />
+
+      <label for="paymentMethod">Metode Pembayaran</label>
+      <select id="paymentMethod" name="paymentMethod" required>
+        <option value="" disabled selected>Pilih metode pembayaran</option>
+        <option value="QRIS">QRIS <a href="https://ibb.co/WpP9qdLP"><img src="https://i.ibb.co/tPxfkN9x/qris.png" alt="qris" border="0"></a></option>
+        <option value="Dana">Dana</option>
+      </select>
+
+      <label for="amount">Jumlah Pembayaran (Rp)</label>
+      <input type="number" id="amount" name="amount" placeholder="Masukkan nominal pembayaran" min="1" required />
+
+      <label for="transactionId">ID Transaksi (Opsional)</label>
+      <input type="text" id="transactionId" name="transactionId" placeholder="Masukkan ID transaksi jika ada" autocomplete="off" />
+
+      <label for="notes">Catatan (Opsional)</label>
+      <input type="text" id="notes" name="notes" placeholder="Masukkan catatan jika diperlukan" />
+
+      <label for="contactWA">Nomor WhatsApp Anda</label>
+      <input type="tel" id="contactWA" name="contactWA" placeholder="Contoh: 082112345678 (tanpa +)" pattern="[0-9]{8,15}" required />
+
+      <button type="submit" aria-label="Kirim konfirmasi pembayaran ke WhatsApp">Kirim Konfirmasi</button>
+    </form>
+
+    <footer>© 2024 Pembayaran. Hubungi kami untuk info lebih lanjut.</footer>
+  </div>
+
+  <script>
+    (function() {
+      const whatsappNumber = '6285717149980'; // Ganti dengan nomor WhatsApp tujuan Anda tanpa tanda +
+
+      const form = document.getElementById('paymentForm');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const payerName = form.payerName.value.trim();
+        const paymentMethod = form.paymentMethod.value;
+        const amount = form.amount.value.trim();
+        const transactionId = form.transactionId.value.trim();
+        const notes = form.notes.value.trim();
+        const contactWA = form.contactWA.value.trim();
+
+        if (!payerName || !paymentMethod || !amount || !contactWA) {
+          alert('Mohon isi semua kolom wajib dengan benar.');
+          return;
+        }
+        if (!/^\d{8,15}$/.test(contactWA)) {
+          alert('Nomor WhatsApp tidak valid. Harus 8-15 digit tanpa tanda "+".');
+          return;
+        }
+        if (Number(amount) <= 0) {
+          alert('Jumlah pembayaran harus lebih dari 0.');
+          return;
+        }
+
+        let message = `Halo, saya ingin mengonfirmasi pembayaran:\n\n`;
+        message += `Nama Pembayar: ${payerName}\n`;
+        message += `Metode Pembayaran: ${paymentMethod}\n`;
+        message += `Jumlah Pembayaran: Rp ${Number(amount).toLocaleString('id-ID')}\n`;
+        if (transactionId) message += `ID Transaksi: ${transactionId}\n`;
+        if (notes) message += `Catatan: ${notes}\n`;
+        message += `Nomor WhatsApp Kontak: ${contactWA}\n\n`;
+        message += `Terima kasih.`;
+
+        const encodedMessage = encodeURIComponent(message);
+        const url = `https://wa.me/${6285717149980}?text=${encodedMessage}`;
+        window.open(url, '_blank');
+      });
+    })();
+  </script>
+</body>
+</html>
